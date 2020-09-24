@@ -139,6 +139,7 @@ class Resque
 			return;
 		}
 
+		Resque_Stat::incr('removed:' . (string)$queue);
 		return json_decode($item, true);
 	}
 
@@ -151,7 +152,9 @@ class Resque
 	 */
 	public static function dequeue($queue, $items = Array())
 	{
-	    if(count($items) > 0) {
+        $count = count($items);
+	    if($count > 0) {
+            Resque_Stat::incr('removed:' . (string)$queue, $count);
 			return self::removeItems($queue, $items);
 	    } else {
 			return self::removeList($queue);
@@ -245,6 +248,7 @@ class Resque
 		}
 
 		Resque_Job::create($queue, $class, $args, $trackStatus, $id, $prefix);
+        Resque_Stat::incr('added:' . (string)$queue);
 		Resque_Event::trigger('afterEnqueue', $hookParams);
 
 		return $id;

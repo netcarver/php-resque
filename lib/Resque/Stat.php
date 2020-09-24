@@ -53,4 +53,13 @@ class Resque_Stat
 	{
 		return (bool)Resque::redis()->del('stat:' . $stat);
 	}
+
+    /**
+     * Get the value of the supplied statistic counter and then reset it to 0 as
+     * one atomic operation.
+     */
+    public static function getAndZero($stat)
+    {
+        return (int)Resque::redis()->getset('stat:' . $stat, 0);
+    }
 }
